@@ -1,8 +1,12 @@
 import express from 'express';
 import fs from "fs";
+import { parse } from 'path';
+import { postRouteur } from '../../ROUTES/post-route';
+
+server.use("/api/posts" , postRouteur)
 
 
-// instance de l'app express
+// instance de l'app express:
 const server = express()
 
 server.get('/api/posts', (req, res)=> {
@@ -110,4 +114,43 @@ server.get("/api/user", (req, res) => {
       }
     });
   });
+
+  // Exercice:
+// Ajouter un handler pour l'url "/api/todo" avec la method DELETE:
+// /api/todo?id=2
+// /api/todo?id=4
+// Récuperer la liste des todos
+// Si la todo n'existe pas , retourner un 404
+// Sinon SUpprimer la todo du tableau
+// Ecrire dans le ficher la nouvelle liste
+// Retourner un message: Tache supprimée
+
+server.get('api/todo' , (req, res) =>{
+    const taskUrl = req.query;
+
+    if (!taskUrl.id) {
+        res.status(400).json({erro: `il y'a une erreur`});
+        return
+    }
+    fs.readFile( "../src/data/todo.json" , (err, data)=>{
+        if (err) {
+            return res.status(500).json({err: 'problème 500'})
+        }
+
+        if(!data.id){
+            return res.status(400).json({err: 'erreur 404'})
+        }else{
+           
+        }
+
+        const dataStrings = data.toString()
+        const dataObjects = JSON.data(dataStrings)
+
+        const dataFilter = dataObjects.todos.filter((task)=>{
+            return task.id == taskUrl.id;
+        })
+
+       
+    })
+})
 
