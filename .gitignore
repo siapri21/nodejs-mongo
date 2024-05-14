@@ -1,0 +1,10 @@
+  pour manipule les methode post et get 
+  
+  if (req.method === "GET") {
+       res.end("Tous les articles");
+       return
+    }
+    if(req.method === "POST") {
+       res.end("créer un article");
+       return
+    }
