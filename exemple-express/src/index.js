@@ -1,13 +1,18 @@
 import express from 'express';
 import fs from "fs";
-import { parse } from 'path';
-import { postRouteur } from '../../ROUTES/post-route';
+import  parse  from 'path';
+import {postRouteur} from './ROUTES/post-route.js';
+// import ServerResponse, { maxHeaderSize }  from 'http';
+import  error from 'console';
+import { captureRejectionSymbol } from 'events';
+import { title } from 'process';
 
-server.use("/api/posts" , postRouteur)
 
 
 // instance de l'app express:
 const server = express()
+server.use(express.json())
+server.use("/api/posts" , postRouteur)
 
 server.get('/api/posts', (req, res)=> {
     console.log(req);
@@ -58,9 +63,6 @@ server.get('/api/todo', (req, res)=> {
     })
     
 });
-
-
-
 
 // * Pour collecter les informations à partir de l'URL :
 // * ex: /api/user?firstname=Doe&lastname=John
@@ -153,4 +155,55 @@ server.get('api/todo' , (req, res) =>{
        
     })
 })
+
+
+// /api/todos/2
+// /api/todos/3
+// Exercice: Modifier une todo dans la liste
+// 0. Ajouter un handler PUT qui recoit dans corps de la requete: title et date
+// 1. Verifier si title et date est envoyé sinon retourner un erreur
+// 2. récuperer toutes les taches
+// 3. Mettre la tache à jour
+// 4. Retourner la tache mise à jour ajoutée dans la réponse
+
+server.put("/todos/:id", (req, res) =>{
+
+    const id = Number(req.params.id);
+    const data =  req.body;
+    // on deverifier si le titre et le date sont dans le body
+    if (!data.title || !data.date) {
+        return res.status(400).json({error: "Envoyé le titre et la date"})  
+    }
+
+  const dataTodos = fs.readFileSync("./src/todo.json")
+
+  const todosObject =JSON.parse(dataTodos.toString())
+
+  // trouver la position de la tache a modifier
+const indexId = todosObject.todos.findIndex((index) =>{
+    return index.id == data.id
+})
+
+if(indexId == -1){
+    return res.status(400).json({error: `l'identifiant est introuvable`})  
+    }
+
+  // assigné le nouveau titre et la nouvelle date
+
+//   todos c'est le table qui contient les obj
+
+  todosObject.todos[indexId].title = data.title
+  todosObject.todos[indexId].date = data.date
+
+
+//   stringidy transforme en chaine de caractere le fichier
+  fs.writeFileSync("./src/todo.json", JSON.stringify(todosObject) )
+
+  return res.json({
+    error: "la tache est mise à jour"
+  });
+})
+
+
+
 
